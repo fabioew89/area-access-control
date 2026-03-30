@@ -1,22 +1,28 @@
 services:
   postgres:
     image: postgres:14-alpine
-    resources:
-      limits:
-        cpus: '0.5'
-        memory: 512M
-    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: ${CPUS_LIMITS}
+          memory: ${MENORY_LIMITS}
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
       POSTGRES_DB: ${DB_NAME}
     ports:
       - ${DB_PORT}:${DB_PORT}
+    restart: always
     volumes:
       - pg_data:/var/lib/postgresql/data
 
   adminer:
     image: adminer
+    deploy:
+      resources:
+        limits:
+          cpus: ${CPUS_LIMITS}
+          memory: ${MENORY_LIMITS}
     restart: always
     ports:
       - 8080:8080
