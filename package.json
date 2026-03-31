@@ -1,12 +1,13 @@
 {
   "name": "area-access-control",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "npx tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "cz commit": "cz"
   },
   "keywords": [],
   "author": "",
@@ -35,6 +36,7 @@
     "@types/compression": "^1.8.1",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^25.5.0"
+    "@types/node": "^25.5.0",
+    "commitizen": "^4.3.1"
   }
 }
