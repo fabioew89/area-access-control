@@ -2,6 +2,7 @@ import { appDataSource } from "../database/appDataSource.js";
 import { Colaborador } from "../entities/Colaborador.js";
 import { AppError } from "../errors/AppError.js";
 
+// Define quais dados o metodo create precisa receber.
 interface CreateColaboradorRequest {
   nome: string;
   matricula: string;
@@ -11,6 +12,7 @@ interface CreateColaboradorRequest {
 }
 
 export class ColaboradorService {
+  // Repository e a ferramenta do TypeORM para acessar a tabela no banco.
   private colaboradorRepository = appDataSource.getRepository(Colaborador);
 
   async create({
@@ -20,6 +22,7 @@ export class ColaboradorService {
     setor,
     foto_url,
   }: CreateColaboradorRequest): Promise<Colaborador> {
+    // Verifica se a matricula ja esta cadastrada antes de criar.
     const matriculaExists = await this.colaboradorRepository.findOne({
       where: { matricula },
     });
@@ -28,6 +31,7 @@ export class ColaboradorService {
       throw new AppError("Ja existe um colaborador com essa matricula.", 409);
     }
 
+    // Cria o objeto da entidade em memoria.
     const colaborador = this.colaboradorRepository.create({
       nome,
       matricula,
@@ -36,10 +40,12 @@ export class ColaboradorService {
       foto_url,
     });
 
+    // Salva o colaborador no banco.
     return this.colaboradorRepository.save(colaborador);
   }
 
   async list(): Promise<Colaborador[]> {
+    // Busca todos os colaboradores ordenados pelos mais recentes.
     return this.colaboradorRepository.find({
       order: {
         criado_em: "DESC",
@@ -48,6 +54,7 @@ export class ColaboradorService {
   }
 
   async findById(id: string): Promise<Colaborador> {
+    // Procura um colaborador pelo id informado.
     const colaborador = await this.colaboradorRepository.findOne({
       where: { id },
     });
@@ -56,6 +63,7 @@ export class ColaboradorService {
       throw new AppError("Colaborador nao encontrado.", 404);
     }
 
+    // Retorna o colaborador encontrado.
     return colaborador;
   }
 }
