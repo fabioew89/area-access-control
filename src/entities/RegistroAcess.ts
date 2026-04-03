@@ -34,7 +34,7 @@ export class RegistroAcesso {
   })
   tipo!: TipoMovimento;
 
-  @Column()
+  @Column({ type: "boolean" })
   autorizado!: boolean;
 
   @CreateDateColumn({ type: "timestamptz" })
@@ -44,6 +44,6 @@ export class RegistroAcesso {
   @JoinColumn({ name: "registrado_por" })
   registrado_por!: Usuario;
 
-  @Column({ nullable: true })
+  @Column({ type: "text", nullable: true })
   observacao?: string;
 }

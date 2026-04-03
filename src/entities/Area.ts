@@ -13,22 +13,22 @@ export class Area {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column()
+  @Column({ type: "text" })
   nome!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: "text", nullable: true })
   descricao?: string;
 
   @Column({ type: "enum", enum: NivelRisco })
   nivel_risco!: NivelRisco;
 
-  @Column()
+  @Column({ type: "int" })
   capacidade!: number;
 
   @ManyToOne(() => Colaborador)
   @JoinColumn({ name: "responsavel_id" })
   responsavel!: Colaborador;
 
-  @Column({ default: true })
+  @Column({ type: "boolean", default: true })
   ativa!: boolean;
 }

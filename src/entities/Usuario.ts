@@ -12,13 +12,13 @@ export class Usuario {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column()
+  @Column({ type: "text" })
   nome!: string;
 
-  @Column({ unique: true })
+  @Column({ type: "text", unique: true })
   email!: string;
 
-  @Column()
+  @Column({ type: "text" })
   senha_hash!: string;
 
   @Column({ type: "enum", enum: Perfil, default: Perfil.OPERADOR })
