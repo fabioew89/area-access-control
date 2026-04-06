@@ -1,9 +1,13 @@
 import { Request, Response, NextFunction } from "express";
-import { ColaboradorService } from "../services/ColaboradorService.js";
+import { ZodError } from "zod";
+import { AppError } from "../errors/AppError.js";
+import {
+  ColaboradorService,
+  parseCreateColaboradorInput,
+} from "../services/ColaboradorService.js";
 
 export class ColaboradorController {
-  // O controller delega a regra de negocio para o service.
-  private colaboradorService = new ColaboradorService();
+  constructor(private colaboradorService = new ColaboradorService()) {}
 
   async store(
     req: Request,
@@ -13,9 +17,7 @@ export class ColaboradorController {
     try {
       // Le os dados enviados no corpo da requisicao.
       const { nome, matricula, cargo, setor, foto_url } = req.body;
-
-      // Chama o service para criar o colaborador.
-      const colaborador = await this.colaboradorService.create({
+      const data = parseCreateColaboradorInput({
         nome,
         matricula,
         cargo,
@@ -23,9 +25,17 @@ export class ColaboradorController {
         foto_url,
       });
 
+      // Chama o service para criar o colaborador.
+      const colaborador = await this.colaboradorService.create(data);
+
       // 201 indica que um novo registro foi criado com sucesso.
       res.status(201).json(colaborador);
     } catch (error) {
+      if (error instanceof ZodError) {
+        next(new AppError("Dados de entrada invalidos.", 400, error.flatten()));
+        return;
+      }
+
       // Encaminha qualquer erro para o middleware global.
       next(error);
     }
@@ -58,6 +68,11 @@ export class ColaboradorController {
 
       res.json(colaborador);
     } catch (error) {
+      if (error instanceof ZodError) {
+        next(new AppError("Dados de entrada invalidos.", 400, error.flatten()));
+        return;
+      }
+
       next(error);
     }
   }

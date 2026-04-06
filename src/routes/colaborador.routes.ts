@@ -1,22 +1,37 @@
-import { Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import { ColaboradorController } from "../controllers/ColaboradorController.js";
+import { ensureAuthenticated } from "../middlewares/ensureAuthenticated.js";
 
-const colaboradorRoutes = Router();
-const colaboradorController = new ColaboradorController();
+type AuthMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => void;
 
-// Cria um novo colaborador.
-colaboradorRoutes.post("/", (req, res, next) =>
-  colaboradorController.store(req, res, next)
-);
+export function createColaboradorRoutes(
+  colaboradorController = new ColaboradorController(),
+  authMiddleware: AuthMiddleware = ensureAuthenticated
+) {
+  const colaboradorRoutes = Router();
 
-// Lista todos os colaboradores.
-colaboradorRoutes.get("/", (req, res, next) =>
-  colaboradorController.index(req, res, next)
-);
+  colaboradorRoutes.use(authMiddleware);
 
-// Busca um colaborador especifico pelo id.
-colaboradorRoutes.get("/:id", (req, res, next) =>
-  colaboradorController.show(req, res, next)
-);
+  // Cria um novo colaborador.
+  colaboradorRoutes.post("/", (req, res, next) =>
+    colaboradorController.store(req, res, next)
+  );
 
-export { colaboradorRoutes };
+  // Lista todos os colaboradores.
+  colaboradorRoutes.get("/", (req, res, next) =>
+    colaboradorController.index(req, res, next)
+  );
+
+  // Busca um colaborador especifico pelo id.
+  colaboradorRoutes.get("/:id", (req, res, next) =>
+    colaboradorController.show(req, res, next)
+  );
+
+  return colaboradorRoutes;
+}
+
+export const colaboradorRoutes = createColaboradorRoutes();

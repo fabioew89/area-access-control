@@ -8,12 +8,11 @@ No estado atual, a aplicacao disponibiliza:
 
 - inicializacao de servidor Express com TypeScript
 - conexao com PostgreSQL via TypeORM
+- autenticacao com JWT
 - criacao e consulta de colaboradores
 - tratamento centralizado de erros com `AppError`
 - modelagem inicial de `Colaborador`, `Area`, `RegistroAcesso` e `Usuario`
 - ambiente local com Docker Compose e Adminer
-
-Observacao: o projeto ja possui dependencias e variaveis de ambiente relacionadas a JWT, mas os endpoints de autenticacao ainda nao estao expostos no servidor atual.
 
 ## Tecnologias
 
@@ -111,6 +110,60 @@ Resposta esperada:
 - `GET /colaboradores`
 - `GET /colaboradores/:id`
 
+Observacao:
+
+- as rotas de colaboradores exigem token JWT no cabecalho `Authorization: Bearer <token>`
+
+### Autenticacao
+
+- `POST /auth/register`
+- `POST /auth/login`
+- `POST /auth/refresh`
+
+Exemplo de cadastro:
+
+```json
+{
+  "nome": "Admin Local",
+  "email": "admin@empresa.com",
+  "senha": "123456",
+  "perfil": "ADMIN"
+}
+```
+
+Exemplo de login:
+
+```json
+{
+  "email": "admin@empresa.com",
+  "senha": "123456"
+}
+```
+
+Exemplo de refresh:
+
+```json
+{
+  "refreshToken": "seu-refresh-token"
+}
+```
+
+Resposta esperada nos endpoints de autenticacao:
+
+```json
+{
+  "user": {
+    "id": "uuid",
+    "nome": "Admin Local",
+    "email": "admin@empresa.com",
+    "perfil": "ADMIN",
+    "criado_em": "2026-04-05T12:00:00.000Z"
+  },
+  "accessToken": "jwt-de-curta-duracao",
+  "refreshToken": "jwt-de-longa-duracao"
+}
+```
+
 Exemplo de payload para criacao:
 
 ```json
@@ -126,6 +179,8 @@ Exemplo de payload para criacao:
 Regras implementadas:
 
 - `matricula` deve ser unica
+- `nome`, `cargo` e `setor` possuem validacao minima
+- `foto_url`, quando informada, deve ser uma URL valida
 - a listagem retorna os colaboradores mais recentes primeiro
 - buscar um `id` inexistente retorna erro `404`
 

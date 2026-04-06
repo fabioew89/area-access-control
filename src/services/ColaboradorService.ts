@@ -1,14 +1,25 @@
 import { appDataSource } from "../database/appDataSource.js";
 import { Colaborador } from "../entities/Colaborador.js";
 import { AppError } from "../errors/AppError.js";
+import { z } from "zod";
 
 // Define quais dados o metodo create precisa receber.
-interface CreateColaboradorRequest {
-  nome: string;
-  matricula: string;
-  cargo: string;
-  setor: string;
-  foto_url?: string;
+export const createColaboradorSchema = z.object({
+  nome: z.string().trim().min(3, "Nome deve ter pelo menos 3 caracteres."),
+  matricula: z
+    .string()
+    .trim()
+    .min(1, "Matricula e obrigatoria.")
+    .max(50, "Matricula muito longa."),
+  cargo: z.string().trim().min(2, "Cargo deve ter pelo menos 2 caracteres."),
+  setor: z.string().trim().min(2, "Setor deve ter pelo menos 2 caracteres."),
+  foto_url: z.url("Foto deve ser uma URL valida.").optional(),
+});
+
+export type CreateColaboradorRequest = z.infer<typeof createColaboradorSchema>;
+
+export function parseCreateColaboradorInput(input: CreateColaboradorRequest) {
+  return createColaboradorSchema.parse(input);
 }
 
 export class ColaboradorService {
@@ -22,9 +33,17 @@ export class ColaboradorService {
     setor,
     foto_url,
   }: CreateColaboradorRequest): Promise<Colaborador> {
+    const data = parseCreateColaboradorInput({
+      nome,
+      matricula,
+      cargo,
+      setor,
+      foto_url,
+    });
+
     // Verifica se a matricula ja esta cadastrada antes de criar.
     const matriculaExists = await this.colaboradorRepository.findOne({
-      where: { matricula },
+      where: { matricula: data.matricula },
     });
 
     if (matriculaExists) {
@@ -33,11 +52,11 @@ export class ColaboradorService {
 
     // Cria o objeto da entidade em memoria.
     const colaborador = this.colaboradorRepository.create({
-      nome,
-      matricula,
-      cargo,
-      setor,
-      foto_url,
+      nome: data.nome,
+      matricula: data.matricula,
+      cargo: data.cargo,
+      setor: data.setor,
+      foto_url: data.foto_url,
     });
 
     // Salva o colaborador no banco.

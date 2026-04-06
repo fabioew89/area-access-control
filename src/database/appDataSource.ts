@@ -1,4 +1,8 @@
 import { DataSource } from "typeorm";
+import { Area } from "../entities/Area.js";
+import { Colaborador } from "../entities/Colaborador.js";
+import { RegistroAcesso } from "../entities/RegistroAcess.js";
+import { Usuario } from "../entities/Usuario.js";
 
 export const appDataSource = new DataSource({
   type: "postgres",
@@ -10,5 +14,5 @@ export const appDataSource = new DataSource({
 
   synchronize: true,
   logging: false,
-  entities: ["src/entities/**/*.ts"],
+  entities: [Area, Colaborador, RegistroAcesso, Usuario],
 });
