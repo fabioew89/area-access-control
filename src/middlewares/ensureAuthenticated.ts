@@ -7,6 +7,7 @@ export function ensureAuthenticated(
   _res: Response,
   next: NextFunction
 ): void {
+  // Espera o formato padrao "Bearer <token>" enviado no header Authorization.
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
@@ -21,6 +22,7 @@ export function ensureAuthenticated(
 
   const payload = verifyAccessToken(token);
 
+  // Depois de validar o token, anexamos o usuario na request para uso nas rotas protegidas.
   req.user = {
     id: payload.sub,
     email: payload.email,

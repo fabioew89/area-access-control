@@ -29,12 +29,14 @@ export interface JwtPayload {
 }
 
 export function signAccessToken(payload: JwtPayload): string {
+  // Access token curto reduz o impacto de vazamento e e usado nas chamadas autenticadas.
   return jwt.sign(payload, getAccessSecret(), {
     expiresIn: "15m",
   });
 }
 
 export function signRefreshToken(payload: JwtPayload): string {
+  // Refresh token dura mais para permitir renovacao sem pedir login a cada expiracao do access token.
   return jwt.sign(payload, getRefreshSecret(), {
     expiresIn: "7d",
   });
@@ -50,6 +52,7 @@ export function verifyAccessToken(token: string): JwtPayload {
 
 export function verifyRefreshToken(token: string): JwtPayload {
   try {
+    // Mantemos secrets separados para poder revogar/rotacionar access e refresh de forma independente.
     return jwt.verify(token, getRefreshSecret()) as unknown as JwtPayload;
   } catch {
     throw new AppError("Refresh token invalido ou expirado.", 401);

@@ -47,11 +47,13 @@ type LoginRequest = z.infer<typeof loginSchema>;
 type RefreshRequest = z.infer<typeof refreshSchema>;
 
 export class AuthService {
+  // Centraliza o acesso a usuarios para manter as regras de autenticacao no service.
   private usuarioRepository = appDataSource.getRepository(Usuario);
 
   async register(input: RegisterRequest) {
     const data = registerSchema.parse(input);
 
+    // O email e a chave unica de login, entao normalizamos e validamos antes de persistir.
     const existingUser = await this.usuarioRepository.findOne({
       where: { email: data.email },
     });
@@ -60,6 +62,7 @@ export class AuthService {
       throw new AppError("Ja existe um usuario com esse email.", 409);
     }
 
+    // A senha nunca e salva em texto puro; apenas o hash vai para o banco.
     const senha_hash = await bcrypt.hash(data.senha, 10);
 
     const user = this.usuarioRepository.create({
@@ -85,6 +88,7 @@ export class AuthService {
       throw new AppError("Email ou senha invalidos.", 401);
     }
 
+    // A comparacao do bcrypt usa o hash armazenado para validar a senha enviada no login.
     const senhaValida = await bcrypt.compare(data.senha, user.senha_hash);
 
     if (!senhaValida) {
@@ -96,6 +100,7 @@ export class AuthService {
 
   async refresh(input: RefreshRequest) {
     const data = refreshSchema.parse(input);
+    // O refresh token reemite um novo par de tokens sem exigir novo login.
     const payload = verifyRefreshToken(data.refreshToken);
 
     const user = await this.usuarioRepository.findOne({
@@ -110,12 +115,14 @@ export class AuthService {
   }
 
   private buildAuthResponse(user: Usuario) {
+    // O payload carrega apenas o minimo necessario para identificar e autorizar o usuario.
     const tokenPayload = {
       sub: user.id,
       email: user.email,
       perfil: user.perfil,
     };
 
+    // Cada autenticacao devolve um access token curto e um refresh token mais duradouro.
     const accessToken = signAccessToken(tokenPayload);
     const refreshToken = signRefreshToken(tokenPayload);
 

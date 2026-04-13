@@ -9,6 +9,7 @@ const PORT = process.env.PORT ?? 3000;
 appDataSource
   .initialize()
   .then(() => {
+    // A API so comeca a aceitar requisicoes depois que o banco estiver pronto.
     console.log("Banco de dados conectado!");
     app.listen(PORT, () => {
       console.log(`Servidor rodando na porta ${PORT}`);

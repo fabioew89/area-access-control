@@ -12,6 +12,7 @@ export const appDataSource = new DataSource({
   password: process.env.DB_PASS as string,
   database: process.env.DB_NAME as string,
 
+  // synchronize agiliza o desenvolvimento, mas deve ser revisado antes de uso em producao.
   synchronize: true,
   logging: false,
   entities: [Area, Colaborador, RegistroAcesso, Usuario],

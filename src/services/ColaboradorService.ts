@@ -19,6 +19,7 @@ export const createColaboradorSchema = z.object({
 export type CreateColaboradorRequest = z.infer<typeof createColaboradorSchema>;
 
 export function parseCreateColaboradorInput(input: CreateColaboradorRequest) {
+  // Centraliza a validacao para reutilizar a mesma regra em controller e service.
   return createColaboradorSchema.parse(input);
 }
 
@@ -33,6 +34,7 @@ export class ColaboradorService {
     setor,
     foto_url,
   }: CreateColaboradorRequest): Promise<Colaborador> {
+    // Revalida os dados mesmo que eles ja tenham sido conferidos na camada HTTP.
     const data = parseCreateColaboradorInput({
       nome,
       matricula,

@@ -12,8 +12,10 @@ export function createColaboradorRoutes(
   colaboradorController = new ColaboradorController(),
   authMiddleware: AuthMiddleware = ensureAuthenticated
 ) {
+  // Router dedicado ao CRUD inicial de colaboradores.
   const colaboradorRoutes = Router();
 
+  // Todas as rotas deste modulo exigem usuario autenticado.
   colaboradorRoutes.use(authMiddleware);
 
   // Cria um novo colaborador.
@@ -34,4 +36,5 @@ export function createColaboradorRoutes(
   return colaboradorRoutes;
 }
 
+// Export pronto para uso no bootstrap padrao da aplicacao.
 export const colaboradorRoutes = createColaboradorRoutes();

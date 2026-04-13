@@ -22,6 +22,7 @@ export function createApp(options: CreateAppOptions = {}) {
   const app = express();
 
   app.use(express.json());
+  // As rotas sao montadas aqui para permitir injecao de dependencias em testes.
   app.use("/auth", createAuthRoutes(options.authController));
   app.use(
     "/colaboradores",
@@ -35,6 +36,7 @@ export function createApp(options: CreateAppOptions = {}) {
     res.json({ status: "ok", mensagem: "Servidor funcionando!" });
   });
 
+  // O ultimo middleware traduz erros de dominio em respostas HTTP consistentes.
   app.use(
     (
       error: Error,
